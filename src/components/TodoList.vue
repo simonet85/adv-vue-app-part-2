@@ -13,37 +13,12 @@
       enter-active-class="animated fadeInUp"
       leave-active-class="animated fadeOutDown"
     >
-      <div
+      <todo-item
         v-for="(todo, index) in todosFiltered"
         :key="todo.id"
-        class="todo-item"
-      >
-        <div class="todo-item-left">
-          <input type="checkbox" v-model="todo.completed" />
-          <div
-            v-if="!todo.editing"
-            class="todo-item-label"
-            :class="{ completed: todo.completed }"
-            @dblclick="editTodo(todo)"
-          >
-            {{ todo.title }}
-          </div>
-          <input
-            v-else
-            type="text"
-            class="todo-item-edit"
-            v-model="todo.title"
-            @blur="doneTodo(todo)"
-            @keyup.enter="doneTodo(todo)"
-            @keyup.esc="cancelEdit(todo)"
-            v-focus
-          />
-        </div>
-
-        <div class="remove-item" @click="deleteTodo(index)">
-          &times;
-        </div>
-      </div>
+        :todo="todo"
+        :index="index"
+      />
     </transition-group>
     <div class="extra-container">
       <div>
@@ -88,6 +63,7 @@
 </template>
 
 <script>
+import TodoItem from "./TodoItem";
 export default {
   data() {
     return {
@@ -110,6 +86,9 @@ export default {
         },
       ],
     };
+  },
+  components: {
+    TodoItem,
   },
   directives: {
     focus: {
