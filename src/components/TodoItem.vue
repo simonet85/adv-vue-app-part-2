@@ -1,7 +1,7 @@
 <template>
   <div class="todo-item">
     <div class="todo-item-left">
-      <input type="checkbox" v-model="completed" />
+      <input type="checkbox" v-model="completed" @change="doneTodo" />
       <div
         v-if="!editing"
         class="todo-item-label"
@@ -40,18 +40,64 @@ export default {
       type: Number,
       required: true,
     },
+    checkAll: {
+      type: Boolean,
+      required: true,
+    },
   },
   data() {
+    //Make a copy of our properties for making them mutatble
     return {
       id: this.todo.id,
       title: this.todo.title,
-      completed: this.todo.editing,
+      editing: this.todo.editing,
+      completed: this.todo.completed,
       beforeRditingCache: "",
     };
   },
+  directives: {
+    focus: {
+      inserted: function(el) {
+        el.focus();
+      },
+    },
+  },
   methods: {
-    deleteTodo(index) {
+    deleteTodo: function(index) {
       this.$emit("deletedTodo", index); //emit an event to remove the todo item
+    },
+    editTodo: function() {
+      this.beforeEditCache = this.title; //Caching the title before editing
+      this.editing = true;
+    },
+    doneTodo: function() {
+      if (this.title.trim() == "") {
+        this.title = this.beforeEditCache;
+      }
+      this.editing = false;
+      this.$emit("finishedEdit", {
+        index: this.index,
+        todo: {
+          id: this.id,
+          title: this.title,
+          completed: this.completed,
+          editing: this.editing,
+        },
+      });
+    },
+    cancelEdit: function() {
+      this.title = this.beforeEditCache; // Retrieving the cached title while pressing ESC
+      this.editing = false;
+    },
+  },
+  watch: {
+    //Watch properties when they change and update them accordingly
+    checkAll: function() {
+      if (this.checkAll) {
+        this.completed = true;
+      } else {
+        this.completed = this.todo.completed;
+      }
     },
   },
 };

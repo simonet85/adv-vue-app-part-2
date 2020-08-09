@@ -18,7 +18,9 @@
         :key="todo.id"
         :todo="todo"
         :index="index"
+        :checkAll="!anyRemaining"
         @deletedTodo="deleteTodo"
+        @finishedEdit="finishedEdit"
       />
     </transition-group>
     <div class="extra-container">
@@ -91,13 +93,7 @@ export default {
   components: {
     TodoItem,
   },
-  directives: {
-    focus: {
-      inserted: function(el) {
-        el.focus();
-      },
-    },
-  },
+
   methods: {
     createTodo: function() {
       if (this.newTodo.trim().length === 0) {
@@ -114,20 +110,6 @@ export default {
     deleteTodo: function(index) {
       this.todos.splice(index, 1);
     },
-    editTodo: function(todo) {
-      this.beforeEditCache = todo.title; //Caching the title before editing
-      todo.editing = true;
-    },
-    doneTodo: function(todo) {
-      if (todo.title.trim() == "") {
-        todo.title = this.beforeEditCache;
-      }
-      todo.editing = false;
-    },
-    cancelEdit: function(todo) {
-      todo.title = this.beforeEditCache; // Retrieving the cached title while pressing ESC
-      todo.editing = false;
-    },
     checkAllTodos: function() {
       this.todos.forEach((todo) => {
         todo.completed = event.target.checked;
@@ -135,6 +117,10 @@ export default {
     },
     clearCompleted: function() {
       this.todos = this.todos.filter((todo) => !todo.completed);
+    },
+    finishedEdit: function(data) {
+      //getting data Object passed along with the event
+      this.todos.splice(data.index, 1, data.todo); //replace 1 item with data.todo
     },
   },
   computed: {
