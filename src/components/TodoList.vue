@@ -18,6 +18,7 @@
         :key="todo.id"
         :todo="todo"
         :index="index"
+        @deletedTodo="deleteTodo"
       />
     </transition-group>
     <div class="extra-container">
